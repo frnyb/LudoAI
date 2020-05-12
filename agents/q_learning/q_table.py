@@ -1,6 +1,8 @@
 import ludopy
 import numpy as np
 
+from copy import deepcopy
+
 from .q_state import QState
 
 class QTable():
@@ -43,33 +45,33 @@ class QTable():
             else:
                 for i in move_pieces:
                     self.current_table_entry[i] = 0
+
+            self.state_dict[key] = deepcopy(self.current_table_entry)
         else:
-            self.current_table_entry = self.state_dict[key]
+            self.current_table_entry = deepcopy(self.state_dict[key])
 
     def get_action(
             self,
             epsilon=0.1
     ):
         # Determine action
-        if len(move_pieces) > 0:
-            random_int = np.random.randint(
-                    0,
-                    high=100
-            )
-            if random_int > 100 * epsilon:
-                self.action = int(max(
-                    self.current_table_entry.keys,
-                    key=lambda k: self.current_table_entry[k]
-                ))
-            else:
-                self.action = self.current_table_entry.keys[
-                        np.random.randint(
-                            0, 
-                            high=len(self.current_table_entry)
-                        )
-                ]
+        random_int = np.random.randint(
+                0,
+                high=100
+        )
+        if random_int > 100 * epsilon:
+            self.action = int(max(
+                self.current_table_entry.keys(),
+                key=lambda k: self.current_table_entry[k]
+            ))
         else:
-            self.action = -1
+            entry_list = list(self.current_table_entry)
+            self.action = self.current_table_entry.keys()[
+                    np.random.randint(
+                        0, 
+                        high=len(entry_list)
+                    )
+            ]
 
         return self.action
 
@@ -82,7 +84,7 @@ class QTable():
             last_key = self.last_state.get_key()
             last_Q = self.state_dict[last_key][self.last_action]
 
-            delta_Q = self.learning_rate * (reward + self.discount_factor * max(list(table_entry)) - last_Q)
+            delta_Q = self.learning_rate * (reward + self.discount_factor * max(list(self.current_table_entry)) - last_Q)
             last_Q += delta_Q
 
             self.state_dict[last_key][self.last_action] = last_Q
