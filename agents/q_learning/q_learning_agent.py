@@ -5,26 +5,31 @@ from copy import deepcopy
 
 from ..agent import Agent
 from .q_table import QTable
-from .q_state import QState
 
 class QLearningAgent(Agent):
     def __init__(
             self,
             game,
+            player_number,
             discount_factor=1,
             learning_rate=0.1
     ):
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
 
-        self.states = []
+        self.q_table = QTable(
+                self.discount_factor,
+                self.learning_rate
+        )
 
         Agent.__init__(
                 self,
-                game
+                game,
+                player_number
         )
 
-    def determine_piece_to_move(self): #todo
+    # Todo: Something with epsilon
+    def determine_piece_to_move(self): 
         (dice, move_pieces, player_pieces, enemy_pieces, player_is_a_winner, there_is_a_winner), player_i = self.game.get_observation()
 
         self.dice = deepcopy(dice)
@@ -32,22 +37,18 @@ class QLearningAgent(Agent):
         self.player_pieces = deepcopy(player_pieces)
         self.enemy_pieces = deepcopy(enemy_pieces)
 
-        if len(move_pieces) > 0:
-            return move_pieces[np.random.randint(0, len(move_pieces))]
-        else:
-            return -1
-
-    def on_finished_move(self): #todo
-        q_state = QState(
+        self.q_table.on_new_turn(
                 self.dice,
                 self.player_pieces,
-                self.enemy_pieces
+                self.enemy_pieces,
+                self.move_pieces
         )
 
-        key = q_state.get_key()
+        return self.q_table.get_action(epsilon=0.5)
 
-        if key in self.states:
-            print("ups")
-
-        self.states.append(key)
+    def on_finished_move(self):
+        if self.game.first_winner_was == self.player_number:
+            self.q_table.update_Q_value(reward=1)
+        else:
+            self.q_table.update_Q_value()
 
