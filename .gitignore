@@ -1,1 +1,4 @@
 Pipfile.lock
+*.pdf
+*.mp4
+*.npy
