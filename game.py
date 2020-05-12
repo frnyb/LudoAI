@@ -3,20 +3,19 @@
 import ludopy
 import numpy as np
 
-g = ludopy.Game()
+from agents.random_agent import RandomAgent
+
+game = ludopy.Game()
 there_is_a_winner = False
 
+agents = [RandomAgent(game),RandomAgent(game),RandomAgent(game),RandomAgent(game)]
+
 while not there_is_a_winner:
-    (dice, move_pieces, player_pieces, enemy_pieces, player_is_a_winner, there_is_a_winner), player_i = g.get_observation()
+    agents[game.current_player].move()
 
-    if len(move_pieces):
-        piece_to_move = move_pieces[np.random.randint(0, len(move_pieces))]
-    else:
-        piece_to_move = -1
-
-    _, _, _, _, _, there_is_a_winner = g.answer_observation(piece_to_move)
+    there_is_a_winner = len(game.game_winners) > 0
 
 print("Saving history to numpy file")
-g.save_hist(f"game_history.npy")
+game.save_hist(f"game_history.npy")
 print("Saving game video")
-g.save_hist_video(f"game_video.mp4")
+game.save_hist_video(f"game_video.mp4")
