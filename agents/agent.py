@@ -3,9 +3,11 @@ import ludopy
 class Agent():
     def __init__(
             self,
-            game
+            game,
+            player_number
     ):
         self.game = game
+        self.player_number = player_number
 
     def move(self):
         piece_to_move = self.determine_piece_to_move()
