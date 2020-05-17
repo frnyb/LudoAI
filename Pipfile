@@ -9,6 +9,7 @@ verify_ssl = true
 numpy = "*"
 ludopy = "*"
 opencv-python = "*"
+json = "*"
 
 [requires]
 python_version = "3.6"
