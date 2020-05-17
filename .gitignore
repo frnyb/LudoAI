@@ -4,3 +4,7 @@ Pipfile.lock
 *.npy
 *.swp
 __pycache__
+*.json
+qtables
+*.lock
+
